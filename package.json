@@ -1,0 +1,28 @@
+{
+  "name": "discord-open-space",
+  "version": "1.0.0",
+  "description": "Create extra voice channels if one is used",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reichmann-M/Discord-Open-Space.git"
+  },
+  "keywords": [
+    "discord",
+    "discord-js",
+    "bot"
+  ],
+  "author": "reichmann-m",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Reichmann-M/Discord-Open-Space/issues"
+  },
+  "homepage": "https://github.com/Reichmann-M/Discord-Open-Space#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "util": "^0.12.3"
+  }
+}
