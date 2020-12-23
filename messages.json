@@ -1,3 +1,4 @@
 {
-    "ChannelCreationReason": "Channel created by Discord Open Space Bot"
+    "ChannelCreationReason": "Channel created by Discord Open Space Bot",
+    "ChannelDeleteReason": "Channel deleted by Discord Open Space Bot"
 }

@@ -1,6 +1,3 @@
-console.log('works')
-
-
 const Discord = require('discord.js')
 const bot = new Discord.Client();
 const fs = require('fs')
@@ -77,7 +74,7 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
 
                     if (!bUsersInBaseChannel && !bUsersInDChannel) {
                         baseChannel.derivatedChannels.every(dChannel => {
-                            bot.channels.cache.get(dChannel.id).delete().then().catch(console.error)
+                            bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
                             console.log('Success: Deleted derivated channel ' + dChannel.id)
                             return true
                         })
@@ -104,7 +101,7 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                                     return true
                                 })
                                 if (!bUsersInBaseChannel && !bUsersInDChannel) {
-                                    bot.channels.cache.get(dChannel.id).delete().then().catch(console.error)
+                                    bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
                                     baseChannel.derivatedChannels = []
                                     console.log('Success: Deleted derivated channel ' + dChannel.id)
                                 }
