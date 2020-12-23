@@ -44,7 +44,6 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                         type: 'voice',
                         parent: oBaseChannel.parent,
                         bitrate: oBaseChannel.bitrate,
-                        position: oBaseChannel.position + 3,
                         reason: baseChannel.id + messages.ChannelCreationReason
                     })
                 }
@@ -136,12 +135,16 @@ bot.on("channelCreate", async function (createdChannel) {
         return true
     })
 
+    // Set derivated channel position
+    var baseChannel = bot.channels.cache.get(baseChannelID)
+    createdChannel.edit({position: baseChannel.position + 1})
+
     // Update managed guild channels
     oMGC.guilds.every(managedGuild => {
         if (managedGuild.id == createdChannel.guild.id) {
-            managedGuild.baseChannels.every(baseChannel => {
-                if (baseChannel.id == baseChannelID) {
-                    baseChannel.derivatedChannels.push({
+            managedGuild.baseChannels.every(managedBaseChannel => {
+                if (managedBaseChannel.id == baseChannelID) {
+                    managedBaseChannel.derivatedChannels.push({
                         name: createdChannel.name,
                         id: createdChannel.id
                     })
