@@ -1,14 +1,15 @@
 const Discord = require('discord.js')
 const bot = new Discord.Client();
+require('dotenv').config();
 const fs = require('fs')
 const util = require('util')
-const config = JSON.parse(fs.readFileSync('config.json'))
-const BOTOWNID = config.bot_id;
 var oMGC = JSON.parse(fs.readFileSync('managedGuildChannels.json'))
 const messages = JSON.parse(fs.readFileSync('messages.json'))
+var BOTOWNID = ''
 
 bot.on("ready", function () {
     console.log(`Logged in as ${bot.user.username}`)
+    BOTOWNID = bot.user.id
 })
 
 bot.on("voiceStateUpdate", function (oldState, newState) {
@@ -17,11 +18,11 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
 
             // Connects to base channel
             if (newState.channelID == baseChannel.id) {
-                console.log('[*] user connected to a watched channel ' + baseChannel.id)
+                console.log('[OPEN-SPACE] User connected to a watched channel ' + baseChannel.id)
 
                 // Create new derivated channel by cloning base channel
                 if (baseChannel.derivatedChannels.length == 0) {
-                    console.log('Try: Creating derivated channel...')
+                    console.log('[OPEN-SPACE] Try: Creating derivated channel...')
                     const sDerivatedChannelName = baseChannel.name + ' 2'
 
                     // Check for already existing channels with same name and parent
@@ -35,7 +36,7 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                         return true
                     });
                     if (bChannelAlreadyExists) {
-                        return console.log('Error: channel already exists')
+                        return console.log('[OPEN-SPACE] Error: channel already exists')
                     }
 
                     const oBaseChannel = bot.channels.cache.get(baseChannel.id)
@@ -75,7 +76,7 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                     if (!bUsersInBaseChannel && !bUsersInDChannel) {
                         baseChannel.derivatedChannels.every(dChannel => {
                             bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
-                            console.log('Success: Deleted derivated channel ' + dChannel.id)
+                            console.log('[OPEN-SPACE] Success: Deleted derivated channel ' + dChannel.id)
                             return true
                         })
                         baseChannel.derivatedChannels = []
@@ -103,7 +104,7 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                                 if (!bUsersInBaseChannel && !bUsersInDChannel) {
                                     bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
                                     baseChannel.derivatedChannels = []
-                                    console.log('Success: Deleted derivated channel ' + dChannel.id)
+                                    console.log('[OPEN-SPACE] Success: Deleted derivated channel ' + dChannel.id)
                                 }
                             }
                             return true;
@@ -129,7 +130,7 @@ bot.on("channelCreate", async function (createdChannel) {
         if (entry.executor.id == BOTOWNID) {
             if (entry.target.id == createdChannel.id && entry.action == 'CHANNEL_CREATE' && entry.reason.includes(messages.ChannelCreationReason)) {
                 baseChannelID = entry.reason.slice(0, 18)
-                console.log("Success: Created derivated channel: " + createdChannel.id + ' of basechannel ' + baseChannelID)
+                console.log("[OPEN-SPACE] Success: Created derivated channel: " + createdChannel.id + ' of basechannel ' + baseChannelID)
                 return false;
             }
         }
@@ -155,4 +156,4 @@ bot.on("channelCreate", async function (createdChannel) {
     })
 })
 
-bot.login(config.token)
+bot.login(process.env.DISCORD_BOT_TOKEN)
