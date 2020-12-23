@@ -82,7 +82,6 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                         baseChannel.derivatedChannels = []
                     }
 
-
                 } else {
                     if (baseChannel.derivatedChannels.length > 0) {
                         baseChannel.derivatedChannels.every(dChannel => {
