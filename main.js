@@ -49,7 +49,6 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                         position: oBaseChannel.position + 3,
                         reason: baseChannel.id + messages.ChannelCreationReason
                     })
-                    return false
                 }
             } else {
                 // User left base channel
@@ -83,7 +82,6 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                             return true
                         })
                         baseChannel.derivatedChannels = []
-                        return false
                     }
 
 
@@ -109,7 +107,6 @@ bot.on("voiceStateUpdate", function (oldState, newState) {
                                     bot.channels.cache.get(dChannel.id).delete().then().catch(console.error)
                                     baseChannel.derivatedChannels = []
                                     console.log('Success: Deleted derivated channel ' + dChannel.id)
-                                    return false
                                 }
                             }
                             return true;
