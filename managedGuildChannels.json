@@ -1,0 +1,28 @@
+{
+    "guilds": [
+        {
+            "name": "bot_test",
+            "id": "648230433229766656",
+            "baseChannels": [
+                {
+                    "name": "Talking",
+                    "id": "791021250243592192",
+                    "parentID": "791019780161011712",
+                    "derivatedChannels": []
+                },
+                {
+                    "name": "Filmeabend",
+                    "id": "791021346149761044",
+                    "parentID": "791019780161011712",
+                    "derivatedChannels": []
+                },
+                {
+                    "name": "WatchToGether",
+                    "id": "791048879575007233",
+                    "parentID": "791019780161011712",
+                    "derivatedChannels": []
+                }
+            ]
+        }
+    ]
+}
