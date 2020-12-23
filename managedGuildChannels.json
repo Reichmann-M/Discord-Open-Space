@@ -5,13 +5,13 @@
             "id": "502899678187225100",
             "baseChannels": [
                 {
-                    "name": "Talking",
+                    "name": "🎄🎤Talking",
                     "id": "706503981181960257",
                     "parentID": "706502710186344448",
                     "derivatedChannels": []
                 },
                 {
-                    "name": "Filmeabend",
+                    "name": "🎄🎬 Filmeabend",
                     "id": "683085115298938889",
                     "parentID": "706502710186344448",
                     "derivatedChannels": []
