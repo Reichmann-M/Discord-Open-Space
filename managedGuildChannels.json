@@ -1,28 +1,31 @@
 {
-    "guilds": [
-        {
-            "name": "bot_test",
-            "id": "648230433229766656",
-            "baseChannels": [
-                {
-                    "name": "⏸🔊Talking",
-                    "id": "791021250243592192",
-                    "parentID": "791019780161011712",
-                    "derivatedChannels": []
-                },
-                {
-                    "name": "❗💩Filmeabend",
-                    "id": "791021346149761044",
-                    "parentID": "791019780161011712",
-                    "derivatedChannels": []
-                },
-                {
-                    "name": "👾🖕WatchToGether",
-                    "id": "791048879575007233",
-                    "parentID": "791019780161011712",
-                    "derivatedChannels": []
-                }
-            ]
-        }
-    ]
+    "guilds": [{
+        "name": "bot_test",
+        "id": "648230433229766656",
+        "watchedChannelCollections": [{
+            "name": "⏸🔊Talking",
+            "id": "4zUANXvb2xSCt7sn",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792859261654269972",
+                "userAmount": 0
+            }]
+        }, {
+            "name": "❗💩Filmeabend",
+            "id": "253MxTWneV3SnkRf",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792852226636382218",
+                "userAmount": 0
+            }]
+        }, {
+            "name": "👾🖕WatchToGether",
+            "id": "78Q4mDM32mJGmN8C",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792852206897332234",
+                "userAmount": 0
+            }]
+        }]
+    }]
 }

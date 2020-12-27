@@ -1,4 +1,7 @@
-const Discord = require('discord.js')
+const Discord = require('discord.js');
+const {
+    create
+} = require('domain');
 const bot = new Discord.Client();
 require('dotenv').config();
 const fs = require('fs')
@@ -12,113 +15,94 @@ bot.on("ready", function () {
     BOTOWNID = bot.user.id
 })
 
-bot.on("voiceStateUpdate", function (oldState, newState) {
-    oMGC.guilds.forEach(managedGuild => {
-        managedGuild.baseChannels.every(baseChannel => {
+// sWChannelID ~ String of Watched Channel ID
+bot.on("voiceStateUpdate", (oldState, newState) => {
+    oMGC.guilds.forEach(oWGuild => {
+        oWGuild.watchedChannelCollections.forEach(aWCollection => {
+            aWCollection.channels.forEach(oWChannel => {
 
-            // Connects to base channel
-            if (newState.channelID == baseChannel.id) {
-                console.log('[OPEN-SPACE] User connected to a watched channel ' + baseChannel.id)
+                // User joins watched channel:
+                if (oldState.channelID != oWChannel.id && newState.channelID == oWChannel.id) {
+                    console.log(`[OPEN-SPACE]: + User ${newState.member.user.id} joined channel "${newState.channel.name}" (${newState.channelID})`)
 
-                // Create new derivated channel by cloning base channel
-                if (baseChannel.derivatedChannels.length == 0) {
-                    console.log('[OPEN-SPACE] Try: Creating derivated channel...')
-                    const sDerivatedChannelName = baseChannel.name + ' 2'
+                    // Update user amount in channel json
+                    oWChannel.userAmount = oWChannel.userAmount + 1;
 
-                    // Check for already existing channels with same name and parent
-                    const oBaseChannelGuild = bot.guilds.cache.get(managedGuild.id)
-                    var bChannelAlreadyExists = false;
-                    oBaseChannelGuild.channels.cache.every(guildChannel => {
-                        if (guildChannel.parentID == baseChannel.parentID && guildChannel.name == sDerivatedChannelName) {
-                            bChannelAlreadyExists = true;
-                            return false
-                        }
-                        return true
-                    });
-                    if (bChannelAlreadyExists) {
-                        return console.log('[OPEN-SPACE] Error: channel already exists')
-                    }
-
-                    const oBaseChannel = bot.channels.cache.get(baseChannel.id)
-                    oBaseChannelGuild.channels.create(sDerivatedChannelName, {
-                        type: 'voice',
-                        parent: oBaseChannel.parent,
-                        bitrate: oBaseChannel.bitrate,
-                        reason: baseChannel.id + messages.ChannelCreationReason
-                    })
+                    // Handle Channel
+                    manageChannels(aWCollection, oWGuild.id)
                 }
-            } else {
-                // User left base channel
-                if (oldState.channelID == baseChannel.id) {
-                    //TODO: user leaves base channel
 
-                    var oGuildVoiceStates = bot.guilds.cache.get(managedGuild.id).voiceStates.cache
-                    var bUsersInBaseChannel = false;
-                    var bUsersInDChannel = false;
-                    oGuildVoiceStates.every(voiceState => {
-                        if (voiceState.channelID == baseChannel.id) {
-                            bUsersInBaseChannel = true
-                        }
-                        baseChannel.derivatedChannels.every(dChannel => {
-                            if (voiceState.channelID == dChannel.id) {
-                                bUsersInDChannel = true
-                                return false
-                            }
-                            return true
-                        })
-                        if (bUsersInBaseChannel && bUsersInDChannel) {
-                            return false
-                        }
-                        return true
-                    })
+                // User leaves watched channel:
+                else if (oldState.channelID == oWChannel.id && newState.channelID != oWChannel.id) {
+                    console.log(`[OPEN-SPACE]: - User ${newState.member.user.id} left channel "${oldState.channel.name}" (${oldState.channelID})`)
 
-                    if (!bUsersInBaseChannel && !bUsersInDChannel) {
-                        baseChannel.derivatedChannels.every(dChannel => {
-                            bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
-                            console.log('[OPEN-SPACE] Success: Deleted derivated channel ' + dChannel.id)
-                            return true
-                        })
-                        baseChannel.derivatedChannels = []
-                    }
+                    // Update user amount in channel json
+                    oWChannel.userAmount = oWChannel.userAmount - 1;
 
-                } else {
-                    if (baseChannel.derivatedChannels.length > 0) {
-                        baseChannel.derivatedChannels.every(dChannel => {
-                            // User left derivated channel
-                            if (oldState.channelID == dChannel.id) {
-                                var oGuildVoiceStates = bot.guilds.cache.get(managedGuild.id).voiceStates.cache
-                                var bUsersInBaseChannel = false;
-                                var bUsersInDChannel = false;
-                                oGuildVoiceStates.every(voiceState => {
-                                    if (voiceState.channelID == baseChannel.id) {
-                                        bUsersInBaseChannel = true
-                                    }
-                                    if (voiceState.channelID == dChannel.id) {
-                                        bUsersInDChannel = true
-                                        return false
-                                    }
-                                    return true
-                                })
-                                if (!bUsersInBaseChannel && !bUsersInDChannel) {
-                                    bot.channels.cache.get(dChannel.id).delete({reason: messages.ChannelDeleteReason}).then().catch(console.error)
-                                    baseChannel.derivatedChannels = []
-                                    console.log('[OPEN-SPACE] Success: Deleted derivated channel ' + dChannel.id)
-                                }
-                            }
-                            return true;
-                        })
-                    }
-
+                    // Handle Channel
+                    manageChannels(aWCollection, oWGuild.id)
                 }
-            }
-            return true
+            });
         });
     });
 })
 
+
+function manageChannels(currentCollection, currentGuildID) {
+    var oCurrentGuild = bot.guilds.cache.get(currentGuildID)
+
+    // Check if one and only one EMPTY channel in this collection exists
+    const oneAndOnlyOne = arr => arr.filter(v => v.userAmount == 0).length == 1;
+    if (oneAndOnlyOne(currentCollection.channels)) {
+        // Do nothing
+    } else {
+        // Count how many channels with 0 users exists
+        var aEmptyChannels = []
+        currentCollection.channels.forEach(oWChannel => {
+            if (oWChannel.userAmount == 0) {
+                aEmptyChannels.push(oWChannel)
+            }
+        });
+
+        if (aEmptyChannels.length == 0) {
+            // Create new empty channel
+            const oTemplateChannel = bot.channels.cache.get(currentCollection.channels[0].id)
+            oCurrentGuild.channels.create(currentCollection.name, {
+                type: 'voice',
+                parent: oTemplateChannel.parent,
+                bitrate: oTemplateChannel.bitrate,
+                reason: currentCollection.id + messages.ChannelCreationReason
+            })
+
+        } else {
+            // More than one empty channel
+
+            const oPivotChannel = bot.channels.cache.get(aEmptyChannels[0].id)
+            oPivotChannel.delete({
+                reason: messages.ChannelDeleteReason
+            })
+
+            // Delete Channel from collection JSON
+            oMGC.guilds.forEach(oWGuild => {
+                oWGuild.watchedChannelCollections.forEach(aWCollection => {
+                    aWCollection.channels = aWCollection.channels.filter(function (obj) {
+                        return obj.id !== aEmptyChannels[0].id;
+                    });
+                });
+            });
+
+            console.log("[OPEN-SPACE] Success: Deleted derivated channel: " + aEmptyChannels[0].id + ' of collection ' + currentCollection.id)
+
+            // Save oMGC in JSON
+            fs.writeFileSync('managedGuildChannels.json', JSON.stringify(oMGC))
+
+        }
+    }
+}
+
 bot.on("channelCreate", async function (createdChannel) {
     const oCreatedChannelGuild = bot.guilds.cache.get(createdChannel.guild.id);
-    var baseChannelID = '';
+    var foundCollectionID = '';
 
     // Check for audit logs entries executed by bot
     const guildAuditLog = await oCreatedChannelGuild.fetchAuditLogs({
@@ -127,35 +111,38 @@ bot.on("channelCreate", async function (createdChannel) {
     guildAuditLog.entries.every(entry => {
         if (entry.executor.id == BOTOWNID) {
             if (entry.target.id == createdChannel.id && entry.action == 'CHANNEL_CREATE' && entry.reason.includes(messages.ChannelCreationReason)) {
-                baseChannelID = entry.reason.slice(0, 18)
-                console.log("[OPEN-SPACE] Success: Created derivated channel: " + createdChannel.id + ' of basechannel ' + baseChannelID)
+                foundCollectionID = entry.reason.slice(0, 16)
+                console.log("[OPEN-SPACE] Success: Created derivated channel: " + createdChannel.id + ' of collection ' + foundCollectionID)
+
+                // Set derivated channel position +
+                // Add new channel to collection
+                oMGC.guilds.forEach(oWGuild => {
+                    oWGuild.watchedChannelCollections.every(aWCollection => {
+                        if (aWCollection.id == foundCollectionID) {
+                            createdChannel.edit({
+                                position: bot.channels.cache.get(aWCollection.channels[aWCollection.channels.length - 1].id).position + 1
+                            })
+                            aWCollection.channels.push({
+                                id: createdChannel.id,
+                                userAmount: 0
+                            })
+                            return false
+                        }
+                        return true
+                    });
+                });
+
+                // Save oMGC in JSON
+                fs.writeFileSync('managedGuildChannels.json', JSON.stringify(oMGC))
+
                 return false;
             }
         }
         return true
     })
 
-    // Set derivated channel position
-    var baseChannel = bot.channels.cache.get(baseChannelID)
-    createdChannel.edit({position: baseChannel.position + 1})
 
-    // Update managed guild channels
-    oMGC.guilds.every(managedGuild => {
-        if (managedGuild.id == createdChannel.guild.id) {
-            managedGuild.baseChannels.every(managedBaseChannel => {
-                if (managedBaseChannel.id == baseChannelID) {
-                    managedBaseChannel.derivatedChannels.push({
-                        name: createdChannel.name,
-                        id: createdChannel.id
-                    })
-                    return false
-                }
-                return true
-            })
-            return false
-        }
-        return true
-    })
 })
+
 
 bot.login(process.env.DISCORD_BOT_TOKEN)
