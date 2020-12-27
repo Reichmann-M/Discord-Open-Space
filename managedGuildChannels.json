@@ -1,22 +1,31 @@
 {
-    "guilds": [
-        {
-            "name": "Wichtel's Club",
-            "id": "502899678187225100",
-            "baseChannels": [
-                {
-                    "name": "🎄🎤Talking",
-                    "id": "706503981181960257",
-                    "parentID": "706502710186344448",
-                    "derivatedChannels": []
-                },
-                {
-                    "name": "🎄🎬 Filmeabend",
-                    "id": "683085115298938889",
-                    "parentID": "706502710186344448",
-                    "derivatedChannels": []
-                }
-            ]
-        }
-    ]
+    "guilds": [{
+        "name": "bot_test",
+        "id": "648230433229766656",
+        "watchedChannelCollections": [{
+            "name": "⏸🔊Talking",
+            "id": "4zUANXvb2xSCt7sn",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792859261654269972",
+                "userAmount": 0
+            }]
+        }, {
+            "name": "❗💩Filmeabend",
+            "id": "253MxTWneV3SnkRf",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792852226636382218",
+                "userAmount": 0
+            }]
+        }, {
+            "name": "👾🖕WatchToGether",
+            "id": "78Q4mDM32mJGmN8C",
+            "parentID": "791019780161011712",
+            "channels": [{
+                "id": "792852206897332234",
+                "userAmount": 0
+            }]
+        }]
+    }]
 }
